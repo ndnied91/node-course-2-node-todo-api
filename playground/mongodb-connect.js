@@ -12,7 +12,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp' ,  {useNewUrlParser: tru
       const db = client.db('TodoApp');
 
       db.collection('Todos').insertOne({
-        text: "Walk the dog",
+        text: "Walk the cat",
         completed: false
 
       }, (err,result)=>{
