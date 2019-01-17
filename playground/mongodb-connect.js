@@ -10,34 +10,31 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp' ,  {useNewUrlParser: tru
     }
       console.log("Connected succesfully to server");
       const db = client.db('TodoApp');
-      //
-      // db.collection('Todos').insertOne({
-      //   text: "Adding something to datbase 3",
-      //   completed: false
-      //
-      // }, (err,result)=>{
-      //     if(err){
-      //       return console.log(`Error occused` , err);
-      //     }
-      //     console.log(`succesfully added to database` ,
-      //     JSON.stringify(result.ops, undefined , 2))
-      //    })
 
-      //CHALLENGE
-       //create users collection
-          //name, age , location
+      db.collection('Todos').insertOne({
+        text: "Walk the dog",
+        completed: false
 
-          db.collection('USERS').insertOne({
-            name:"Mike",
-            age: 27,
-            location: "Maine"
-          }, (err,result)=>{
-            if(err){
-            return console.log(`Error occured during insertion of item` , err);
+      }, (err,result)=>{
+          if(err){
+            return console.log(`Error occused` , err);
           }
-              console.log(`succesfully added to Users database`,
-              JSON.stringify(result.ops, undefined , 2))
-        })
+          console.log(`succesfully added to database` ,
+          JSON.stringify(result.ops, undefined , 2))
+         })
+
+
+        //   db.collection('USERS').insertOne({
+        //     name:"Mike",
+        //     age: 27,
+        //     location: "Maine"
+        //   }, (err,result)=>{
+        //     if(err){
+        //     return console.log(`Error occured during insertion of item` , err);
+        //   }
+        //       console.log(`succesfully added to Users database`,
+        //       JSON.stringify(result.ops, undefined , 2))
+        // })
           client.close();
 //end of server call
 });
