@@ -65,7 +65,6 @@ it('should not create todo with invalid body data' , ()=>{
   })
 })
 
-
 describe('GET/todos', ()=>{
   it('should get all todos', (done)=>{
     request(app)
