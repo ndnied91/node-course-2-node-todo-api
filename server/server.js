@@ -9,10 +9,14 @@ var {Todo} = require('./models/todo')
 
 app.use(bodyParser.json());
 
-
-
-
-
+app.get('/todos', (req,res)=>{
+  Todo.find().then((todos)=>{
+    res.send({todos})   //success
+  }, (e)=>{
+    res.status(400).send(e);
+    //reject
+  })
+})
 
 app.post('/todos' , (req,res)=>{
   var todo = new Todo({
@@ -24,18 +28,6 @@ app.post('/todos' , (req,res)=>{
     res.status(400).send(`Error occured` , e)
   } )
 })
-
-app.get('/todos', (req,res)=>{
-  Todo.find().then((todos)=>{
-    res.send({todos})   //success
-  }, (e)=>{
-    res.status(400).send(e);
-    //reject
-  })
-})
-
-
-
 
 
 
