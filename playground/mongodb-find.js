@@ -22,8 +22,14 @@ db.collection('USERS').find({name:"Chester"}).toArray().then( (docs)=>{
   console.log(JSON.stringify(docs, undefined , 2))
 }, (err) => console.log(`Unable to fetch users`))
 
-
-
 client.close();
   //end of program
 });
+
+
+
+//CRUD
+//CREATE
+//READ
+//UPDATE
+//DELETE
