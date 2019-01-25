@@ -1,3 +1,4 @@
+const _ = require('lodash')
 
 var express = require('express')
 var app = express()
@@ -79,6 +80,43 @@ Todo.findByIdAndRemove(id).then((todo)=>{
 //have a catch
 
 
+//UPDATE A TODO ITEM
+app.patch('/todos/:id' , (req,res)=>{
+  var id = req.params.id;
+  var body = _.pick(req.body, ['text', 'completed']);
+
+  console.log('body ' , body)
+
+  if (!ObjectID.isValid(id)){
+  return res.status(404).send();
+  }//validation for ID
+
+  if(_.isBoolean(body.completed)&& body.completed){
+    //if its a boolean and its true
+    body.completedAt = new Date().getTime(); //will show when its done
+  } else {
+      body.completed = false;
+      body.completedAt = null;
+  }
+
+      //this will update the database
+        Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo)=>{
+          if( !todo) {
+            return res.status(404).send();
+          }
+          res.send({todo})
+
+        }).catch((e)=>{
+          res.status(400).send()
+        })
+});
+
+
+
+
+
+
+
 //POST ROUTE
 app.post('/todos' , (req,res)=>{
   var todo = new Todo({
@@ -90,10 +128,6 @@ app.post('/todos' , (req,res)=>{
     res.status(400).send(`Error occured` , e)
   });
 });
-
-
-
-
 
 app.listen(port, ()=>{
   console.log(`Started on at port ${port}`)
