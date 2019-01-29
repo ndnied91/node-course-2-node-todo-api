@@ -159,6 +159,7 @@ app.post('/users' , (req,res)=>{
 //PRIVATE ROUTING
 app.get('/users/me', authenticate , (req,res)=>{
   res.send(req.user);
+
 });
 
 
