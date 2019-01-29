@@ -12,6 +12,8 @@ var {mongoose} = require('./db/mongoose')
 var {User} = require('./models/user')
 var {Todo} = require('./models/todo')
 
+var {authenticate} = require('./middleware/authenticate');
+
 app.use(bodyParser.json());
 
 const port = process.env.PORT;
@@ -142,13 +144,8 @@ app.post('/users' , (req,res)=>{
     email : body.email,
     password: body.password
   })
-
   //model methods , called on User
 //    instance methods  user.generateAuthToken adds token to indivdual user
-
-
-
-
   user.save().then(()=>{
     return user.generateAuthToken();
   }).then((token)=>{
@@ -159,14 +156,13 @@ app.post('/users' , (req,res)=>{
 })
 
 
+//PRIVATE ROUTING
+app.get('/users/me', authenticate , (req,res)=>{
+  res.send(req.user);
+});
 
 
-
-
-
-
-
-
+///APP LISTENER
 app.listen(port, ()=>{
   console.log(`Started on at port ${port}`)
 })
