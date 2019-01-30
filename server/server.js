@@ -144,6 +144,10 @@ app.post('/users' , (req,res)=>{
     email : body.email,
     password: body.password
   })
+  
+
+
+
   //model methods , called on User
 //    instance methods  user.generateAuthToken adds token to indivdual user
   user.save().then(()=>{

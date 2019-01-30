@@ -3,6 +3,7 @@ const _ = require('lodash');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 var UserSchema = new mongoose.Schema({
   email: {type: String ,
@@ -70,6 +71,32 @@ UserSchema.statics.findByToken = function(token){
 
 };//end of findByToken
 
+
+
+
+
+UserSchema.pre('save', function(next){
+  //get access to indivdual doc
+
+  //GETS RAN BEFORE CREATING A NEW USER, DOESNT NEED TO BE CALLED IN ANY WAY BC ITS ON THE MODEL
+  var user = this;
+
+  if (user.isModified('password')){
+    //hashpassword
+    var password = user.password
+
+    bcrypt.genSalt(10, (err,salt)=>{
+      bcrypt.hash(password, salt, (err,hash)=>{
+        console.log(`Hashed password ` , hash)
+        user.password = hash;
+        next();
+      })
+    })
+
+
+  } else
+      next();
+})
 
 var User = mongoose.model('User' , UserSchema);
 
