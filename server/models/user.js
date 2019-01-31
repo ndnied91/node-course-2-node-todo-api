@@ -72,6 +72,25 @@ UserSchema.statics.findByToken = function(token){
 };//end of findByToken
 
 
+UserSchema.statics.findbyCredentials = function(email, password){
+
+  var User = this;
+
+  return User.findOne({email}).then((user)=>{
+    if(!user){
+    return Promise.reject(); //user doesnt exist
+  }
+
+
+  return new Promise((resolve, reject)=>{
+    //comparing password provided and user.password
+      bcrypt.compare(password, user.password, (err,res)=>{
+          if(res) resolve(user);
+            else reject();
+      })
+  })
+})
+}
 
 
 
@@ -87,7 +106,6 @@ UserSchema.pre('save', function(next){
 
     bcrypt.genSalt(10, (err,salt)=>{
       bcrypt.hash(password, salt, (err,hash)=>{
-        console.log(`Hashed password ` , hash)
         user.password = hash;
         next();
       })

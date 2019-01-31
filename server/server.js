@@ -11,6 +11,7 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose')
 var {User} = require('./models/user')
 var {Todo} = require('./models/todo')
+const bcrypt = require('bcryptjs')
 
 var {authenticate} = require('./middleware/authenticate');
 
@@ -144,7 +145,7 @@ app.post('/users' , (req,res)=>{
     email : body.email,
     password: body.password
   })
-  
+
 
 
 
@@ -159,12 +160,73 @@ app.post('/users' , (req,res)=>{
   })
 })
 
+//get route to get all users from database
+app.get('/users', (req,res)=>{
+  User.find().then((user)=>{
+    res.send({user})   //success
+  }, (e)=>{
+    res.status(400).send(e);
+    //reject
+  })
+})
 
 //PRIVATE ROUTING
 app.get('/users/me', authenticate , (req,res)=>{
   res.send(req.user);
-
 });
+
+
+
+
+//POST  , /users/login
+    //sending along emial and plain text password
+      //we need to try and find the user matching that email
+      //then match the password to the hashed password
+
+
+app.post('/users/login', (req,res)=>{
+  var body = _.pick(req.body, ['email', 'password']);
+
+  User.findbyCredentials(body.email, body.password).then((user)=>{
+    //creata a new token after validation
+    return user.generateAuthToken().then((token)=>{
+        res.header('x-auth',token).send(user);
+        //this will generate the auth token on login
+    });
+
+
+    res.send('User found')
+    // res.send(user); //found user and validated
+  }).catch((e)=> {
+    res.status(400).send('Something went wrong'); //user cant be found
+  });
+});
+
+
+  //
+  // User.findOne({
+  //   email : email
+  // }).then((user)=>{
+  //
+  // if(!user){
+  //     return res.status(404).send('Cant find this email');
+  //   }
+  //       res.send({user});
+  //   //validate password
+  //   var hashedPassword = user.password;
+  //
+  //   bcrypt.compare(password, hashedPassword, (err,res)=>{
+  //     res.send({user});
+  //   }, (e)=>{
+  //     console.log(e)
+  //   })
+  //
+  //
+  // }, (e)=>{
+  //   res.status(400).send(e);
+  //   //reject
+  // })
+
 
 
 ///APP LISTENER
@@ -173,7 +235,6 @@ app.listen(port, ()=>{
 })
 
 module.exports = {app};
-
 
 
 
