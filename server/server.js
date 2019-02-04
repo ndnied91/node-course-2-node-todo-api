@@ -20,8 +20,10 @@ app.use(bodyParser.json());
 const port = process.env.PORT;
 
 //GET ALL
-app.get('/todos', (req,res)=>{
-  Todo.find().then((todos)=>{
+app.get('/todos', authenticate, (req,res)=>{
+  Todo.find({
+    _creator: req.user._id
+  }).then((todos)=>{
     res.send({todos})   //success
   }, (e)=>{
     res.status(400).send(e);
@@ -123,9 +125,10 @@ app.patch('/todos/:id' , (req,res)=>{
 
 
 //POST ROUTE
-app.post('/todos' , (req,res)=>{
+app.post('/todos' , authenticate,  (req,res)=>{
   var todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    _creator: req.user._id
   })
   todo.save().then((doc)=>{
       res.send(doc)
@@ -136,17 +139,13 @@ app.post('/todos' , (req,res)=>{
 
 
 
-
-
 app.post('/users' , (req,res)=>{
   var body = _.pick(req.body, ['email', 'password']);
-  // console.log(body.email)
+
   var user = new User({
     email : body.email,
     password: body.password
   })
-
-
 
 
   //model methods , called on User
@@ -176,56 +175,36 @@ app.get('/users/me', authenticate , (req,res)=>{
 });
 
 
-
-
 //POST  , /users/login
     //sending along emial and plain text password
       //we need to try and find the user matching that email
       //then match the password to the hashed password
 
 
-app.post('/users/login', (req,res)=>{
-  var body = _.pick(req.body, ['email', 'password']);
+/////////////////
+app.post('/users/login' , (req,res)=>{
+  var body = _.pick(req.body, ['email' , 'password']);
 
   User.findbyCredentials(body.email, body.password).then((user)=>{
-    //creata a new token after validation
-    return user.generateAuthToken().then((token)=>{
-        res.header('x-auth',token).send(user);
-        //this will generate the auth token on login
-    });
+      return user.generateAuthToken().then((token)=>{
+        res.header('x-auth', token).send(user);
+      });
+      //end of gen auth token call
+  }).catch((e)=>{
+    res.status(400).send('unable to find the user')
+  })
+})
 
 
-    res.send('User found')
-    // res.send(user); //found user and validated
-  }).catch((e)=> {
-    res.status(400).send('Something went wrong'); //user cant be found
-  });
-});
+//LOG OUT PRIVATE ROUTE
+app.delete('/users/me/token', authenticate, (req,res)=>{
+  req.user.removeToken(req.token).then(()=>{
+    res.status(200).send();
+  } , ()=> {
+    res.status(400).send();
+  })
+})
 
-
-  //
-  // User.findOne({
-  //   email : email
-  // }).then((user)=>{
-  //
-  // if(!user){
-  //     return res.status(404).send('Cant find this email');
-  //   }
-  //       res.send({user});
-  //   //validate password
-  //   var hashedPassword = user.password;
-  //
-  //   bcrypt.compare(password, hashedPassword, (err,res)=>{
-  //     res.send({user});
-  //   }, (e)=>{
-  //     console.log(e)
-  //   })
-  //
-  //
-  // }, (e)=>{
-  //   res.status(400).send(e);
-  //   //reject
-  // })
 
 
 

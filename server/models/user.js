@@ -41,7 +41,7 @@ UserSchema.methods.toJSON = function(){
 UserSchema.methods.generateAuthToken = function(){
   var user = this;
   var access = 'auth';
-  var token = jwt.sign({_id: user._id.toHexString() , access}, 'secretSauce').toString();
+  var token = jwt.sign({_id: user._id.toHexString() , access}, process.env.JWT_SECRET).toString();
 
   user.tokens = user.tokens.concat([{access, token}]);
 
@@ -58,7 +58,7 @@ UserSchema.statics.findByToken = function(token){
   var decoded;  //will store the decoded JWT values
 
     try{
-      decoded = jwt.verify(token, 'secretSauce'); //will try to get the user
+      decoded = jwt.verify(token, process.env.JWT_SECRET); //will try to get the user
     } catch (e) {
       return  Promise.reject();
     } //end of catch block
@@ -115,6 +115,25 @@ UserSchema.pre('save', function(next){
   } else
       next();
 })
+
+
+
+
+UserSchema.methods.removeToken = function(token){
+  var user =this;
+  return user.update({
+    $pull: { tokens: {  token   }  }
+  })
+};
+
+
+
+
+
+
+
+
+
 
 var User = mongoose.model('User' , UserSchema);
 
